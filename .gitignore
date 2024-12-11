@@ -1,10 +1,2 @@
-/*
-/*/
-!/custom_components/
-/custom_components/*
-!/custom_components/nicehash_excavator
 __pycache__/
-!.gitignore
-!hacs.json
-!LICENSE
-!README.md
+/ha_config/*

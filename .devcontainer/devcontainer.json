@@ -1,0 +1,77 @@
+{
+  "name": "ha-excavator",
+  "image": "ghcr.io/netmaxt3r/ha_devcontainer:2024.12.2-1",
+  "containerEnv": {
+    "PYTHONASYNCIODEBUG": "1"
+  },
+  "appPort": [
+    "8123:8123"
+  ],
+  "runArgs": [
+    "-e",
+    "GIT_EDITOR=code --wait",
+    "--security-opt",
+    "label=disable"
+  ],
+  "mounts": [
+    {
+      "source": "./ha_config",
+      "target": "/config",
+      "type": "bind"
+    }
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "charliermarsh.ruff",
+        "ms-python.pylint",
+        "ms-python.vscode-pylance",
+        "visualstudioexptteam.vscodeintellicode",
+        "redhat.vscode-yaml",
+        "esbenp.prettier-vscode",
+        "GitHub.vscode-pull-request-github"
+      ],
+      "settings": {
+        "python.experiments.optOutFrom": [
+          "pythonTestAdapter"
+        ],
+        "python.defaultInterpreterPath": "/srv/homeassistant/bin/python",
+        "python.pythonPath": "/srv/homeassistant/bin/python",
+        "python.terminal.activateEnvInCurrentTerminal": true,
+        "python.testing.pytestArgs": [
+          "--no-cov"
+        ],
+        "pylint.importStrategy": "fromEnvironment",
+        "editor.formatOnPaste": false,
+        "editor.formatOnSave": true,
+        "editor.formatOnType": true,
+        "files.trimTrailingWhitespace": true,
+        "terminal.integrated.profiles.linux": {
+          "zsh": {
+            "path": "/usr/bin/zsh"
+          }
+        },
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "yaml.customTags": [
+          "!input scalar",
+          "!secret scalar",
+          "!include_dir_named scalar",
+          "!include_dir_list scalar",
+          "!include_dir_merge_list scalar",
+          "!include_dir_merge_named scalar"
+        ],
+        "[python]": {
+          "editor.defaultFormatter": "charliermarsh.ruff"
+        },
+        "json.schemas": [
+          {
+            "fileMatch": [
+              "/custom_components/*/manifest.json"
+            ],
+            "url": "https://raw.githubusercontent.com/home-assistant/core/refs/heads/dev/script/json_schemas/manifest_schema.json"
+          }
+        ]
+      }
+    }
+  }
+}
