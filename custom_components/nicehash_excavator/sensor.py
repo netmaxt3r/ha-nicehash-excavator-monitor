@@ -140,6 +140,26 @@ class RigSensor(SensorBase):
 class DeviceSensorBase(SensorBase):
     """Base representation of a Graphics device Sensor."""
 
+    VENDOR_MAP = {
+        "10DE": "NVIDIA",
+        "1002": "AMD",
+        "1043": "ASUS",
+        "103C": "ASUS",
+        "1462": "MSI",
+        "1458": "Gigabyte",
+        "3842": "EVGA",
+        "19DA": "ZOTAC",
+        "1569": "Palit",
+        "196E": "PNY",
+        "10B0": "Gainward",
+        "1DA2": "Sapphire",
+        "174B": "Sapphire",
+        "1849": "ASRock",
+        "148C": "PowerColor",
+        "1545": "VisionTek",
+        "1682": "XFX",
+    }
+
     def __init__(
         self,
         mining_rig: MiningRig,
@@ -165,7 +185,9 @@ class DeviceSensorBase(SensorBase):
                 },
                 "name": self._device_name,
                 "model": self._mining_rig.get_device(self._device_id).name,
-                "manufacturer": self._mining_rig.get_device(self._device_id).subvendor,
+                "manufacturer": DeviceSensorBase.vendor_name(
+                    self._mining_rig.get_device(self._device_id).subvendor
+                ),
                 "via_device": (
                     DOMAIN,
                     f"{self._rig_name} Excavator",
@@ -175,6 +197,14 @@ class DeviceSensorBase(SensorBase):
             if self._enable_debug_logging:
                 _LOGGER.info(error)
             return "unavailable"
+
+    @staticmethod
+    def vendor_name(vendor: str) -> str:
+        """vendor id to vendor name"""
+        vendor = vendor.upper()
+        if vendor in DeviceSensorBase.VENDOR_MAP:
+            return DeviceSensorBase.VENDOR_MAP[vendor]
+        return vendor
 
 
 class GpuTempSensor(DeviceSensorBase):
