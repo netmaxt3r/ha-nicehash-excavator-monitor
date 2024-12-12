@@ -14,6 +14,7 @@ from .const import (
     CONFIG_HOST_PORT,
     CONFIG_NAME,
     CONFIG_UPDATE_INTERVAL,
+    CONFIG_AUTH_TOKEN,
 )
 from .data_containers import Algorithm, GraphicsCard, Worker
 from .excavator import ExcavatorAPI
@@ -34,6 +35,7 @@ class MiningRig:
         self._api = ExcavatorAPI(
             config_entry.data[CONFIG_HOST_ADDRESS],
             config_entry.data[CONFIG_HOST_PORT],
+            config_entry.data[CONFIG_AUTH_TOKEN],
             self._enable_debug_logging,
         )
         self.algorithms = {}
@@ -92,6 +94,10 @@ class MiningRig:
                 hass, self.update, datetime.timedelta(seconds=update_interval)
             )
         )
+
+    def update_auth_token(self, token: str) -> None:
+        """Set new auth token."""
+        self._api.update_auth_token(token)
 
     def get_algorithm(self, algorithm_id) -> Algorithm | None:
         """Get algorithm by id."""

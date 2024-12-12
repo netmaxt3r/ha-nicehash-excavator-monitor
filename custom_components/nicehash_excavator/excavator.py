@@ -16,22 +16,32 @@ class ExcavatorAPI:
     """Excavator API Implementation."""
 
     def __init__(
-        self, host_address: str, host_port: int, enable_debug_logging: bool = False
+        self,
+        host_address: str,
+        host_port: int,
+        auth_token: str = "",
+        enable_debug_logging: bool = False,
     ) -> None:
         """Init ExcavatorAPI."""
         self.host_address = self.format_host_address(host_address)
         self._host_port = host_port
+        self._auth_token = auth_token
         self._enable_debug_logging = enable_debug_logging
+
+    def update_auth_token(self, token: str) -> None:
+        """Set new auth token."""
+        self._auth_token = token
 
     async def request(self, query: str) -> ClientResponse | None:
         """Excavator API Request"""
 
         url = f"{self.host_address}:{self._host_port}/api?command={query}"
-
         if self._enable_debug_logging:
             _LOGGER.info("GET %s", url)
-
-        async with aiohttp.ClientSession() as session:
+        headers = {}
+        if self._auth_token:
+            headers["Authorization"] = self._auth_token
+        async with aiohttp.ClientSession(headers=headers) as session:
             try:
                 async with session.get(url) as response:
                     if response.status == 200:

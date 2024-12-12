@@ -8,7 +8,12 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 
-from .const import CONFIG_ENABLE_DEBUG_LOGGING, CONFIG_UPDATE_INTERVAL, DOMAIN
+from .const import (
+    CONFIG_ENABLE_DEBUG_LOGGING,
+    CONFIG_UPDATE_INTERVAL,
+    DOMAIN,
+    CONFIG_AUTH_TOKEN,
+)
 from .mining_rig import MiningRig
 
 _LOGGER = logging.getLogger(__name__)
@@ -63,4 +68,6 @@ async def update_config(hass, config_entry: ConfigEntry) -> None:
     """Handle options update."""
     mining_rig: MiningRig = hass.data[DOMAIN][config_entry.entry_id]
     update_interval = config_entry.data.get(CONFIG_UPDATE_INTERVAL)
+    auth_token = config_entry.data.get(CONFIG_AUTH_TOKEN)
     mining_rig.set_update_interval(hass, update_interval)
+    mining_rig.update_auth_token(auth_token)

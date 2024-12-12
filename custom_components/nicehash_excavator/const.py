@@ -13,6 +13,7 @@ MIN_UPDATE_INTERVAL = 1
 CONFIG_NAME = "name"
 CONFIG_HOST_ADDRESS = "host_address"
 CONFIG_HOST_PORT = "host_port"
+CONFIG_AUTH_TOKEN = "auth_token"
 CONFIG_UPDATE_INTERVAL = "update_interval"
 CONFIG_UPDATE_INTERVAL_FAST = "update_interval_fast"
 

@@ -20,6 +20,7 @@ from .const import (
     CONFIG_ENABLE_DEBUG_LOGGING,
     CONFIG_HOST_ADDRESS,
     CONFIG_HOST_PORT,
+    CONFIG_AUTH_TOKEN,
     CONFIG_NAME,
     CONFIG_UPDATE_INTERVAL,
     CONFIG_UPDATE_INTERVAL_FAST,
@@ -42,6 +43,7 @@ MAIN_DATA_SCHEMA = {
     vol.Required(CONFIG_NAME): str,
     vol.Required(CONFIG_HOST_ADDRESS): str,
     vol.Required(CONFIG_HOST_PORT, default=DEFAULT_HOST_PORT): int,
+    vol.Optional(CONFIG_AUTH_TOKEN, default=""): str,
     vol.Required(CONFIG_UPDATE_INTERVAL, default=DEFAULT_UPDATE_INTERVAL): int,
     vol.Required(
         CONFIG_UPDATE_INTERVAL_FAST, default=DEFAULT_UPDATE_INTERVAL_FAST
@@ -58,7 +60,9 @@ async def get_errors(data: dict) -> dict[str, any]:
         errors[CONFIG_HOST_PORT] = ERROR_INVALID_PORT
 
     try:
-        excavator = ExcavatorAPI(data[CONFIG_HOST_ADDRESS], data[CONFIG_HOST_PORT])
+        excavator = ExcavatorAPI(
+            data[CONFIG_HOST_ADDRESS], data[CONFIG_HOST_PORT], data[CONFIG_AUTH_TOKEN]
+        )
         result = await excavator.test_connection()
         if not result:
             _LOGGER.error(ERROR_NO_RESPONSE)
@@ -135,6 +139,7 @@ class OptionsFlowHandler(OptionsFlow):
                 new = {**self.config_entry.data}
                 new[CONFIG_HOST_ADDRESS] = user_input[CONFIG_HOST_ADDRESS]
                 new[CONFIG_HOST_PORT] = user_input[CONFIG_HOST_PORT]
+                new[CONFIG_AUTH_TOKEN] = user_input[CONFIG_AUTH_TOKEN]
                 new[CONFIG_UPDATE_INTERVAL] = user_input[CONFIG_UPDATE_INTERVAL]
                 new[CONFIG_UPDATE_INTERVAL_FAST] = user_input[
                     CONFIG_UPDATE_INTERVAL_FAST
@@ -157,6 +162,10 @@ class OptionsFlowHandler(OptionsFlow):
                         CONFIG_HOST_PORT,
                         default=self.config_entry.data.get(CONFIG_HOST_PORT),
                     ): int,
+                    vol.Optional(
+                        CONFIG_AUTH_TOKEN,
+                        default=self.config_entry.data.get(CONFIG_AUTH_TOKEN),
+                    ): str,
                     vol.Required(
                         CONFIG_UPDATE_INTERVAL,
                         default=self.config_entry.data.get(CONFIG_UPDATE_INTERVAL),
