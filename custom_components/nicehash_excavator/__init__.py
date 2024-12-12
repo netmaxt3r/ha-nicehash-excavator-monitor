@@ -14,7 +14,7 @@ from .mining_rig import MiningRig
 _LOGGER = logging.getLogger(__name__)
 
 
-PLATFORMS = [Platform.SENSOR, Platform.SWITCH]
+PLATFORMS = [Platform.SENSOR, Platform.SWITCH, Platform.SELECT]
 
 
 async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:

@@ -1,4 +1,5 @@
 """Nicehash Excavator API"""
+
 from __future__ import annotations
 
 import logging
@@ -34,7 +35,10 @@ class ExcavatorAPI:
             try:
                 async with session.get(url) as response:
                     if response.status == 200:
-                        return await response.json()
+                        json_data = await response.json()
+                        if json_data["error"]:
+                            raise Exception(json_data["error"])
+                        return json_data
                     if response.content:
                         raise Exception(
                             str(response.status)
@@ -44,9 +48,11 @@ class ExcavatorAPI:
                             + str(await response.text())
                         )
                     raise Exception(str(response.status) + ": " + response.reason)
-            except Exception:
+            except Exception as e:
                 if self._enable_debug_logging:
-                    _LOGGER.warning("Error while getting data from %s", url)
+                    _LOGGER.warning(
+                        "Error while getting data from %s error: %s", url, e
+                    )
                 return None
 
     async def test_connection(self) -> bool:
@@ -100,6 +106,28 @@ class ExcavatorAPI:
                 workers[worker.id] = worker
             return workers
         return {}
+
+    async def worker_add_algorithm(self, worker_id: int, algorithm: str) -> bool:
+        """Add algorithm to a worker"""
+        query = (
+            '{"id":1,"method":"worker.add","params":["'
+            + algorithm
+            + '","'
+            + str(worker_id)
+            + '"]}'
+        )
+        response = await self.request(query)
+        if response is not None:
+            return True
+        return False
+
+    async def worker_free(self, worker_id: int) -> bool:
+        """free up worker"""
+        query = '{"id":1,"method":"worker.free","params":["' + str(worker_id) + '"]}'
+        response = await self.request(query)
+        if response is not None:
+            return True
+        return False
 
     @staticmethod
     def format_host_address(host_address: str) -> str:

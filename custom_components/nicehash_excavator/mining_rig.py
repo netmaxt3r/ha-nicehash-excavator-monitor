@@ -1,4 +1,5 @@
 """A MiningRig that connects several devices."""
+
 from __future__ import annotations
 
 import datetime
@@ -109,3 +110,11 @@ class MiningRig:
         if worker_id in self.workers:
             return self.workers[worker_id]
         return None
+
+    async def worker_add_algorithm(self, worker_id: int, algorithm: str) -> bool:
+        """Add algorith to worker"""
+        return await self._api.worker_add_algorithm(worker_id, algorithm)
+
+    async def worker_free(self, worker_id: int) -> bool:
+        """Free worker"""
+        return await self._api.worker_free(worker_id)
