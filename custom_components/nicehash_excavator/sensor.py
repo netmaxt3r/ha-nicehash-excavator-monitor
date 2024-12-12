@@ -1,9 +1,10 @@
 """Sensor integration."""
+
 import logging
 
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import PERCENTAGE, POWER_WATT, TEMP_CELSIUS
+from homeassistant.const import PERCENTAGE, UnitOfPower, UnitOfTemperature
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import Entity
 
@@ -102,11 +103,11 @@ class RigSensor(SensorBase):
             "manufacturer": "NiceHash",
         }
         try:
-            info[
-                "sw_version"
-            ] = f"{self._mining_rig.info.version}, Build: {self._mining_rig.info.build_number}"
+            info["sw_version"] = (
+                f"{self._mining_rig.info.version}, Build: {self._mining_rig.info.build_number}"
+            )
 
-            info["uptime"] = f"{self._mining_rig.info.uptime / 60 / 60}h"
+            # info["uptime"] = f"{self._mining_rig.info.uptime / 60 / 60}h"
 
             gpu_models: dict[str, int]
             gpu_models = {}
@@ -132,7 +133,7 @@ class RigSensor(SensorBase):
             if self._enable_debug_logging:
                 _LOGGER.info(error)
             info["model"] = "No GPUs found"
-            info["uptime"] = "Not available"
+            # info["uptime"] = "Not available"
         return info
 
 
@@ -180,7 +181,7 @@ class GpuTempSensor(DeviceSensorBase):
     """GPU temp sensor."""
 
     device_class = SensorDeviceClass.TEMPERATURE
-    _attr_unit_of_measurement = TEMP_CELSIUS
+    _attr_unit_of_measurement = UnitOfTemperature.CELSIUS
 
     @property
     def name(self) -> str:
@@ -204,7 +205,7 @@ class VRAMTempSensor(DeviceSensorBase):
     """VRAM temp Sensor."""
 
     device_class = SensorDeviceClass.TEMPERATURE
-    _attr_unit_of_measurement = TEMP_CELSIUS
+    _attr_unit_of_measurement = UnitOfTemperature.CELSIUS
 
     @property
     def name(self) -> str:
@@ -228,7 +229,7 @@ class HotspotTempSensor(DeviceSensorBase):
     """Hotspot Sensor."""
 
     device_class = SensorDeviceClass.TEMPERATURE
-    _attr_unit_of_measurement = TEMP_CELSIUS
+    _attr_unit_of_measurement = UnitOfTemperature.CELSIUS
 
     @property
     def name(self) -> str:
@@ -296,7 +297,7 @@ class PowerSensor(DeviceSensorBase):
     """Power Sensor."""
 
     device_class = SensorDeviceClass.POWER
-    _attr_unit_of_measurement = POWER_WATT
+    _attr_unit_of_measurement = UnitOfPower.WATT
 
     @property
     def name(self) -> str:
@@ -525,7 +526,7 @@ class TotalPowerSensor(RigSensor):
     """Miner Power Sensor."""
 
     device_class = SensorDeviceClass.POWER
-    _attr_unit_of_measurement = POWER_WATT
+    _attr_unit_of_measurement = UnitOfPower.WATT
 
     @property
     def name(self) -> str:

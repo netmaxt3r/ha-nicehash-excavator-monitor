@@ -1,4 +1,5 @@
 """Nicehash Excavator integration."""
+
 from __future__ import annotations
 
 import logging
@@ -26,7 +27,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
 
     config_entry.async_on_unload(config_entry.add_update_listener(update_config))
 
-    hass.config_entries.async_setup_platforms(config_entry, PLATFORMS)
+    await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
     return True
 
 
@@ -46,7 +47,6 @@ async def async_migrate_entry(hass, config_entry: ConfigEntry):
     _LOGGER.debug("Migrating from version %s", config_entry.version)
 
     if config_entry.version == 1:
-
         new = {**config_entry.data}
         # TODO_: modify Config Entry data
         new[CONFIG_ENABLE_DEBUG_LOGGING] = False
