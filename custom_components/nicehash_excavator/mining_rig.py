@@ -121,6 +121,10 @@ class MiningRig:
         """Add algorith to worker"""
         return await self._api.device_add_algorithm(device_id, algorithm)
 
+    async def add_algorith(self, algorithm: str) -> bool:
+        """Add algorith to rig"""
+        return await self._api.add_algorithm(algorithm)
+
     async def worker_free(self, worker_id: int) -> bool:
         """Free worker"""
         return await self._api.worker_free(worker_id)

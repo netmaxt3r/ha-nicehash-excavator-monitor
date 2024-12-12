@@ -84,6 +84,15 @@ class AlgorithSelector(SelectEntity, DeviceSensorBase):
                         break
                 if worker_id != -1:
                     await self._mining_rig.worker_free(worker_id)
+                    await self._mining_rig.update()
+
             case _:
                 await self._mining_rig.device_add_algorithm(self._device_uuid, option)
-        await self._mining_rig.update()
+                await self._mining_rig.update()
+                found = False
+                for alg in self._mining_rig.algorithms.values():
+                    if alg.name == option:
+                        found = True
+                        break
+                if not found:
+                    await self._mining_rig.add_algorith(option)

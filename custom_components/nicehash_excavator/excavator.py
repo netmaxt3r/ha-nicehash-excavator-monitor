@@ -131,6 +131,14 @@ class ExcavatorAPI:
             return True
         return False
 
+    async def add_algorithm(self, algorithm: str) -> bool:
+        """Add algorithm to a rig"""
+        query = '{"id":1,"method":"algorithm.add","params":["' + algorithm + '"]}'
+        response = await self.request(query)
+        if response is not None:
+            return True
+        return False
+
     async def worker_free(self, worker_id: int) -> bool:
         """free up worker"""
         query = '{"id":1,"method":"worker.free","params":["' + str(worker_id) + '"]}'
