@@ -117,13 +117,13 @@ class ExcavatorAPI:
             return workers
         return {}
 
-    async def worker_add_algorithm(self, worker_id: int, algorithm: str) -> bool:
+    async def device_add_algorithm(self, device_id: int, algorithm: str) -> bool:
         """Add algorithm to a worker"""
         query = (
             '{"id":1,"method":"worker.add","params":["'
             + algorithm
             + '","'
-            + str(worker_id)
+            + str(device_id)
             + '"]}'
         )
         response = await self.request(query)

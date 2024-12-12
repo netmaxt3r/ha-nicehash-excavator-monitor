@@ -7,6 +7,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import PERCENTAGE, UnitOfPower, UnitOfTemperature
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import Entity
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import CONFIG_ENABLE_DEBUG_LOGGING, CONFIG_NAME, DOMAIN
 from .mining_rig import MiningRig
@@ -15,7 +16,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, config_entry: ConfigEntry, async_add_entities
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Add sensors for passed config_entry in HA."""
 
@@ -45,11 +48,12 @@ async def async_setup_entry(
             AlgorithmHashrateSensor(mining_rig, config_entry, algorithm_id)
         )
 
-    for worker_id in mining_rig.workers:
-        for algorithm_id in mining_rig.get_worker(worker_id).algorithms:
+        # TODO cleanup ids
+        for device_id in mining_rig.devices:
+            uuid = mining_rig.devices[device_id].uuid
             new_devices.append(
                 WorkerAlgorithmHashrateSensor(
-                    mining_rig, config_entry, worker_id, algorithm_id
+                    mining_rig, config_entry, uuid, algorithm_id
                 )
             )
 
@@ -398,23 +402,24 @@ class WorkerAlgorithmHashrateSensor(DeviceSensorBase):
         self,
         mining_rig: MiningRig,
         config_entry: ConfigEntry,
-        worker_id: int,
+        device_uuid: str,
         algorithm_id: int,
     ) -> None:
         """Initialize the sensor."""
-        for device_id in mining_rig.devices:
-            if device_id == mining_rig.get_worker(worker_id).device_id:
-                self._device_id = device_id
+        for device in mining_rig.devices.values():
+            if device.uuid == device_uuid:
+                self._device_id = device.id
                 break
 
         super().__init__(mining_rig, config_entry, self._device_id)
-        self._worker_id = worker_id
+        self._device_uuid = device_uuid
         self._algorithm_id = algorithm_id
+        self.algorithm_name = mining_rig.algorithms[algorithm_id].name
 
     @property
     def name(self) -> str:
         try:
-            return f"{self._rig_name} {self._device_name} {self._mining_rig.get_worker(self._worker_id).algorithms[self._algorithm_id].name}"
+            return f"{self._rig_name} {self._device_name} {self.algorithm_name}"
         except AttributeError as error:
             if self._enable_debug_logging:
                 _LOGGER.info(error)
@@ -423,7 +428,7 @@ class WorkerAlgorithmHashrateSensor(DeviceSensorBase):
     @property
     def unique_id(self) -> str:
         try:
-            return f"{self._rig_name}_{self._device_uuid}_{self._mining_rig.get_worker(self._worker_id).algorithms[self._algorithm_id].name}"
+            return f"{self._rig_name}_{self._device_uuid}_alg_{self.algorithm_name}"
         except AttributeError as error:
             if self._enable_debug_logging:
                 _LOGGER.info(error)
@@ -432,16 +437,20 @@ class WorkerAlgorithmHashrateSensor(DeviceSensorBase):
     @property
     def state(self) -> float:
         try:
-            worker = self._mining_rig.get_worker(self._worker_id)
-            algorithm = worker.algorithms[self._algorithm_id]
-            return round(
-                algorithm.speed / 1000000,
-                2,
-            )
+            for worker in self._mining_rig.workers.values():
+                if worker.device_uuid == self._device_uuid:
+                    for algs in worker.algorithms:
+                        if algs == self._algorithm_id:
+                            algorithm = worker.algorithms[self._algorithm_id]
+                            return round(
+                                algorithm.speed / 1000000,
+                                2,
+                            )
+
         except (AttributeError, TypeError) as error:
             if self._enable_debug_logging:
                 _LOGGER.info(error)
-            return "unavailable"
+        return "unavailable"
 
 
 class AlgorithmHashrateSensor(RigSensor):

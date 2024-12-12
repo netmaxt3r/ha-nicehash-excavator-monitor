@@ -117,9 +117,9 @@ class MiningRig:
             return self.workers[worker_id]
         return None
 
-    async def worker_add_algorithm(self, worker_id: int, algorithm: str) -> bool:
+    async def device_add_algorithm(self, device_id: int, algorithm: str) -> bool:
         """Add algorith to worker"""
-        return await self._api.worker_add_algorithm(worker_id, algorithm)
+        return await self._api.device_add_algorithm(device_id, algorithm)
 
     async def worker_free(self, worker_id: int) -> bool:
         """Free worker"""

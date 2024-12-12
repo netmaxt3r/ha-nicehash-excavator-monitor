@@ -75,9 +75,15 @@ class AlgorithSelector(SelectEntity, DeviceSensorBase):
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
-        worker_id = self._device_id
         match option:
             case "None":
-                await self._mining_rig.worker_free(worker_id)
+                worker_id = -1
+                for w in self._mining_rig.workers.values():
+                    if w.device_uuid == self._device_uuid:
+                        worker_id = w.id
+                        break
+                if worker_id != -1:
+                    await self._mining_rig.worker_free(worker_id)
             case _:
-                await self._mining_rig.worker_add_algorithm(worker_id, option)
+                await self._mining_rig.device_add_algorithm(self._device_uuid, option)
+        await self._mining_rig.update()
