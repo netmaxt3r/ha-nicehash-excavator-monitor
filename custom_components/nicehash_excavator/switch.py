@@ -1,4 +1,5 @@
 """Switch integration."""
+
 from __future__ import annotations
 
 from homeassistant.components.switch import SwitchEntity
@@ -12,6 +13,7 @@ from .const import (
     DOMAIN,
 )
 from .mining_rig import MiningRig
+from .sensor import RigSensor
 
 
 async def async_setup_entry(
@@ -26,18 +28,21 @@ async def async_setup_entry(
     async_add_entities([switch])
 
 
-class RequestRateSwitch(SwitchEntity):
+class RequestRateSwitch(RigSensor, SwitchEntity):
     """Representation of a switch that can be toggled."""
 
     def __init__(
         self, hass: HomeAssistant, mining_rig: MiningRig, config_entry: ConfigEntry
     ) -> None:
         """Initialize the switch."""
+        super().__init__(mining_rig, config_entry)
         self._hass = hass
-        self._mining_rig = mining_rig
         self._config_entry = config_entry
-        self._rig_name = config_entry.data.get(CONFIG_NAME)
         self._state = False
+
+    @property
+    def unique_id(self) -> str:
+        return f"{self._rig_name}_rr_switch"
 
     @property
     def name(self):
